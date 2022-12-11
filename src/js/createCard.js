@@ -1,7 +1,7 @@
 import { icons } from './icons';
 
-export function createImage(images) {
-    return images.map((image) => `<div class="photo-card">
+export function createCard(cards) {
+    return cards.map((image) => `<div class="photo-card">
     <a href="${image.largeImageURL}">
       <img src="${image.webformatURL}" 
       alt="${image.tags}" 

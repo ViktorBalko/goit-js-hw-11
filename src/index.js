@@ -1,39 +1,33 @@
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 import Notiflix from 'notiflix';
-import { createImage } from './js/createImage'
+import { createCard } from './js/createCard'
 import { fetchImages, page, perPage, resetPage } from './js/fetchImages';
 import { onTop, onScroll } from './js/buttonUp';
 
-
-const form = document.querySelector("#search-form");
-const input = document.querySelector(".search-input");
+const searchForm = document.querySelector("#search-form");
+const searchInput = document.querySelector(".search-input");
 const gallery = document.querySelector(".gallery");
 const loadButton = document.querySelector(".load-more");
-
-
-// API_KEY 31872244-df87400a708b3358ddd0a9545;
-
-
-form.addEventListener('submit', onSubmit);
-loadButton.addEventListener('click', onNextPage)
-
-let searchValue = '';
 
 const optionsSL = {
     overlayOpacity: 0.5,
     captionsData: "alt",
-    captionDelay: 250,
-};
+    captionDelay: 150,
+}; 
+
+let searchValue = '';
 let simpleLightbox;
+
+searchForm.addEventListener('submit', onSubmit);
+loadButton.addEventListener('click', onNextPage);
 
 onScroll();
 onTop();
 
-
 async function onSubmit(event) {
     event.preventDefault();
-    searchValue = input.value.trim();
+    searchValue = searchInput.value.trim();
     if (searchValue === '') {
         clearAll();
         buttonHidden();
@@ -44,16 +38,15 @@ async function onSubmit(event) {
             resetPage();
             const result = await fetchImages(searchValue);
             if (result.hits < 1) {
-                form.reset();
+                searchForm.reset();
                 clearAll();
                 buttonHidden();
                 Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
             } else {
-                form.reset();
-                gallery.innerHTML = createImage(result.hits);
+                searchForm.reset();
+                gallery.innerHTML = createCard(result.hits);
                 simpleLightbox = new SimpleLightbox(".gallery a", optionsSL).refresh();
                 buttonUnHidden();
-                
                 Notiflix.Notify.success(`Hooray! We found ${result.totalHits} images.`);
             };
         } catch (error) {
@@ -70,7 +63,7 @@ async function onNextPage() {
                 buttonHidden();
                 Notiflix.Report.info('Wow', "We're sorry, but you've reached the end of search results.", 'Okay');
             }
-        gallery.insertAdjacentHTML('beforeend', createImage(result.hits));
+        gallery.insertAdjacentHTML('beforeend', createCard(result.hits));
         smoothScroll();
         simpleLightbox = new SimpleLightbox(".gallery a", optionsSL).refresh();
     } catch (error) {
@@ -98,7 +91,7 @@ function buttonUnHidden() {
 
 function smoothScroll() {
     const { height: cardHeight } =
-        document.querySelector(".photo-card").firstElementChild.getBoundingClientRect();
+    document.querySelector(".photo-card").firstElementChild.getBoundingClientRect();
     window.scrollBy({
     top: cardHeight * 3.9,
     behavior: "smooth",
